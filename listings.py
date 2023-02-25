@@ -1,18 +1,15 @@
-from bs4 import BeautifulSoup
-import requests
 import os
+import requests
+from bs4 import BeautifulSoup
 from constants import headers
 from imagefetch import download_images
 
-page_num = 1
-url = 'https://dolap.com/profil/'
+user = ''
+url = f'https://dolap.com/profil/{user}'
 response = requests.get(url, headers=headers)
 
+folder_name = user
 soup = BeautifulSoup(response.content, 'html.parser')
-links = soup.find_all('a', {'rel': 'nofollow', 'href': lambda href: href and 'dolap.com/urun' in href})
+links = [link.get('href') for link in soup.find_all('a', {'rel': 'nofollow', 'href': lambda href: href and 'dolap.com/urun' in href})]
 
-image_urls = []
-for link in links:
-    image_urls.append(link.get('href'))
-
-download_images(image_urls, headers)
+download_images(links, folder_name)
