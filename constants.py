@@ -1,6 +1,2 @@
 from fake_useragent import UserAgent
-
-ua = UserAgent()
-headers = {
-    "User-Agent": ua.random
-}
+headers = {"User-Agent": UserAgent().random}
