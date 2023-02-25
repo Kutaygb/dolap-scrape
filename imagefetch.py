@@ -1,30 +1,25 @@
+import os
+import time
 import requests
 from bs4 import BeautifulSoup
-import os
-from constants import headers
-import time
 
-def download_images(image_urls, headers):
+from constants import headers
+
+
+def download_images(image_urls):
     downloaded_urls = set()
     for url in image_urls:
         page = requests.get(url, headers=headers)
         soup = BeautifulSoup(page.content, "html.parser")
 
-        img_tags = soup.find_all("img")
-        for img in img_tags:
-            if "src" in img.attrs:
-                src = img["src"]
-                if not src.startswith("http"):
-                    continue
-                if not src.endswith(".jpg"):
-                    continue
-                if src in downloaded_urls:
-                    continue
-                filename = os.path.join("images", src.split("/")[-1])
-                with open(filename, "wb") as f:
-                    response = requests.get(src, headers=headers)
-                    f.write(response.content)
-                    print(f"{filename} saved.")
-                
-                downloaded_urls.add(src)
-                time.sleep(1)
+        for img in soup.find_all("img", src=lambda src: src and src.startswith("http") and src.endswith(".jpg")):
+            src = img["src"]
+            if src in downloaded_urls:
+                continue
+            filename = os.path.join("images", os.path.basename(src))
+            with open(filename, "wb") as f:
+                response = requests.get(src, headers=headers)
+                f.write(response.content)
+                print(f"{filename} saved.")
+            downloaded_urls.add(src)
+            time.sleep(1)
