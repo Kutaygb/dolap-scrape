@@ -1,7 +1,7 @@
 import os
 import time
 import requests
-import concurrent.futures
+import threading
 from bs4 import BeautifulSoup
 from constants import headers
 
@@ -9,8 +9,7 @@ from constants import headers
 def download_images(image_urls, folder_name):
     downloaded_urls = set()
 
-    def download_image(url):
-        nonlocal downloaded_urls
+    def download(url):
         page = requests.get(url, headers=headers)
         soup = BeautifulSoup(page.content, "html.parser")
 
@@ -27,10 +26,11 @@ def download_images(image_urls, folder_name):
                 print(f"{filepath} saved.")
             downloaded_urls.add(src)
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-        futures = [executor.submit(download_image, url) for url in image_urls]
-        for future in concurrent.futures.as_completed(futures):
-            try:
-                future.result()
-            except Exception as e:
-                print(f"Exception occurred: {e}")
+    threads = []
+    for url in image_urls:
+        t = threading.Thread(target=download, args=(url,))
+        t.start()
+        threads.append(t)
+
+    for t in threads:
+        t.join()
