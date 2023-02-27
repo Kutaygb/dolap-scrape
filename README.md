@@ -33,4 +33,6 @@ Run listings.py.
 python listings.py
 ```
 
-The downloaded
+## Warning
+
+This program was created solely for the purpose of downloading images from my own listings on a specific website. It is not intended for any other use, and I strongly advise against using it for anything else. The website may have terms of service or usage policies that prohibit or limit automated scraping of its content, and using this program in violation of those policies could result in legal or other consequences. Please use this program responsibly and in accordance with the website's policies.
