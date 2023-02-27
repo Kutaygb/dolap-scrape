@@ -1,13 +1,15 @@
 import os
 import time
 import requests
+import threading
 from bs4 import BeautifulSoup
 from constants import headers
 
 
 def download_images(image_urls, folder_name):
     downloaded_urls = set()
-    for url in image_urls:
+
+    def download(url):
         page = requests.get(url, headers=headers)
         soup = BeautifulSoup(page.content, "html.parser")
 
@@ -23,4 +25,12 @@ def download_images(image_urls, folder_name):
                 f.write(response.content)
                 print(f"{filepath} saved.")
             downloaded_urls.add(src)
-            time.sleep(1)
+
+    threads = []
+    for url in image_urls:
+        t = threading.Thread(target=download, args=(url,))
+        t.start()
+        threads.append(t)
+
+    for t in threads:
+        t.join()
